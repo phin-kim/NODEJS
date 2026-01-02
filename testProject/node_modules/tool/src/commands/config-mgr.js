@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+import chalk from 'chalk';
+import fs from 'node:fs';
+import { createLogger } from '../logger.js';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { cosmiconfig } from 'cosmiconfig';
+import betterAjvErrors from 'better-ajv-errors';
+import AJV, { Ajv } from 'ajv';
+//compute dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+//load the schema
+const schemaPath = join(__dirname, '../config/schema.json');
+const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
+console.log('Path', schemaPath);
+const logger = createLogger('config:mgr');
+
+const ajv = new Ajv({ strict: false });
+const configLoader = cosmiconfig('tool');
+export async function getConfig() {
+    const result = await configLoader.search(process.cwd());
+    if (!result) {
+        logger.warning('Could not find configuration usinf default');
+        return { port: 1234 };
+    } else {
+        const isValid = ajv.validate(schema, result.config);
+        if (!isValid) {
+            logger.warning('Invalid configuration was supplied');
+            console.log();
+            console.log(betterAjvErrors(schema, result.config, ajv.errors));
+            process.exit(1);
+        }
+        logger.debug('Found configuration', result.config);
+        return result.config;
+    }
+}
