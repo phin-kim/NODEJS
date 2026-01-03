@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 import arg from 'arg';
 import chalk from 'chalk';
+
 import { createLogger } from '../src/logger.js';
 import { init } from '../src/commands/init.js';
 import { start } from '../src/commands/start.js';
+import { stop } from '../src/commands/stop.js';
+import { status } from '../src/commands/status.js';
+import { ls } from '../src/commands/ls.js';
+import { template } from '../src/commands/template.js';
 const logger = createLogger('bin');
 try {
     const args = arg({
@@ -11,19 +16,25 @@ try {
         '--start': Boolean,
         '--stop': Boolean,
         '--status': Boolean,
+        '--ls': String,
+        '--ext': String,
+        '--template': Boolean,
     });
-    console.log('ARGS', args);
     if (args['--init']) {
         logger.highlight('The app is being initalized');
         await init();
     } else if (args['--start']) {
         await start();
     } else if (args['--stop']) {
-        logger.error('The app has stoped');
+        await stop();
     } else if (args['--status']) {
-        logger.log('App status');
+        await status();
+    } else if (args['--ls'] !== undefined) {
+        await ls(args['--ls'] || '.', args['--ext']);
+    } else if (args['--template']) {
+        await template(args['--template']);
     }
-    console.log('Portin child', process.env.PORT);
+    console.log('Port in child', process.env.PORT);
 } catch (error) {
     logger.error(error.message);
     usage();

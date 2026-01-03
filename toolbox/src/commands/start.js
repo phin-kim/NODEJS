@@ -1,4 +1,6 @@
 import { spawn } from 'node:child_process';
+import fs from 'node:fs/promises';
+
 import { join } from 'node:path';
 import { getConfig } from './config-mng.js';
 import { createLogger } from '../logger.js';
@@ -17,9 +19,15 @@ export async function start() {
         stdio: 'inherit',
         env: { ...process.env, PORT: String(config.port) },
     });
+    //generate a file for the pid
+    await fs.mkdir(join(cwd, '.toolbox'), { recursive: true });
+    await fs.writeFile(join(cwd, '.toolbox', 'pid'), String(child.pid));
+    logger.debug('Saved PID to ', join(cwd, '.toolbox', 'pid'));
     //handle exit
-    child.on('exit', (code) => {
+    child.on('exit', async (code) => {
         logger.warning(`App exited with code ${code}`);
+        await fs.unlink(join(cwd, '.toolbox', 'pid')).catch(() => {});
+        logger.debug(`Removed PID file on exit`);
     });
     //handle errors
     child.on('error', (error) => {

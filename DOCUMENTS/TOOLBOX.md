@@ -50,10 +50,10 @@ const child = spawn('node', [entry], {
 **.on("error",callback)**
 
 -   Fired if node cant fire the child process atall
-    **_NB: ["exit"] fires when the processrun s but finishes, ["error"] fires before the process even starts_**
+    **_NB: `["exit"]` fires when the processrun s but finishes, `["error"]` fires before the process even starts_**
     **.on("close",callback)**
 -   Fires after all[stdio-streams] are closed. Ofteused to clean up resources
-    **_NB: ["exit"] fires when the process finishes, ["close"] process finishes and all output streams flushed_**
+    **_NB: `["exit"]` fires when the process finishes, `["close"]`` process finishes and all output streams flushed_**
 
 **.on("disconnect")**
 
@@ -65,4 +65,4 @@ const child = spawn('node', [entry], {
 -   Fires when the child sends a message via process.send() (IPC).
 
 -   Only works if you spawned with { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] }.
-    **_IPC: interprocess communication==> the way two processes talk to each other_**
+    **_IPC: interprocess communication ==> the way two processes talk to each other_**

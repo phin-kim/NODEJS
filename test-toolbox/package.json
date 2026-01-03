@@ -1,13 +1,8 @@
 {
-  "name": "test-toolbox",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "my-app",
+  "version": "1.0.9",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module"
+    "start": "node src/index.js"
+  }
 }
