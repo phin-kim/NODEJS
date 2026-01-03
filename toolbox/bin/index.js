@@ -3,6 +3,7 @@ import arg from 'arg';
 import chalk from 'chalk';
 import { createLogger } from '../src/logger.js';
 import { init } from '../src/commands/init.js';
+import { start } from '../src/commands/start.js';
 const logger = createLogger('bin');
 try {
     const args = arg({
@@ -11,16 +12,18 @@ try {
         '--stop': Boolean,
         '--status': Boolean,
     });
+    console.log('ARGS', args);
     if (args['--init']) {
         logger.highlight('The app is being initalized');
         await init();
-    } else if (arg['--start']) {
-        logger.warning('The app is starting');
-    } else if (arg['--stop']) {
+    } else if (args['--start']) {
+        await start();
+    } else if (args['--stop']) {
         logger.error('The app has stoped');
-    } else if (arg['--status']) {
+    } else if (args['--status']) {
         logger.log('App status');
     }
+    console.log('Portin child', process.env.PORT);
 } catch (error) {
     logger.error(error.message);
     usage();

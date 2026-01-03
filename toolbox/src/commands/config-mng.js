@@ -1,31 +1,28 @@
-#!/usr/bin/env node
-import fs from 'node:fs';
 import { createLogger } from '../logger.js';
-import { join, dirname } from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { join, dirname } from 'node:path';
 import { cosmiconfig } from 'cosmiconfig';
 import betterAjvErrors from 'better-ajv-errors';
-import AJV, { Ajv } from 'ajv';
-//compute dirname in ESM
+import Ajv from 'ajv';
+//resolve the path to schema
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-//load the schema
+//load schema
 const schemaPath = join(__dirname, '../config/schema.json');
 const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
-console.log('Path', schemaPath);
-const logger = createLogger('config:mgr');
-
+const logger = createLogger('config:config-mng');
+const explorer = cosmiconfig('toolbox');
 const ajv = new Ajv({ strict: false });
-const configLoader = cosmiconfig('tool');
 export async function getConfig() {
-    const result = await configLoader.search(process.cwd());
+    const result = await explorer.search(process.cwd());
     if (!result) {
-        logger.warning('Could not find configuration using default');
-        return { port: 1234 };
+        logger.warning('Failed to locate config resulting to default');
+        return { port: 3000 };
     } else {
         const isValid = ajv.validate(schema, result.config);
         if (!isValid) {
-            logger.warning('Invalid configuration was supplied');
+            logger.warning('Invalid config was supplied');
             console.log();
             console.log(betterAjvErrors(schema, result.config, ajv.errors));
             process.exit(1);
